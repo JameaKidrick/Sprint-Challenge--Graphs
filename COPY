@@ -1,0 +1,202 @@
+from room import Room
+from player import Player
+from world import World
+
+import random
+from ast import literal_eval
+
+from graph import Graph
+from util import Stack, Queue
+
+# Load world
+world = World()
+
+
+# You may uncomment the smaller graphs for development and testing purposes.
+# map_file = "maps/test_line.txt"
+# ['n', 'n']
+# map_file = "maps/test_cross.txt"
+map_file = "maps/test_loop.txt"
+# map_file = "maps/test_loop_fork.txt"
+# map_file = "maps/main_maze.txt"
+
+# Loads the map into a dictionary
+room_graph=literal_eval(open(map_file, "r").read())
+world.load_graph(room_graph)
+
+# Print an ASCII map
+world.print_rooms()
+
+player = Player(world.starting_room)
+
+# Fill this out with directions to walk
+# traversal_path = ['n', 'n']
+traversal_path = []
+
+def lets_go(starting_room, visited = None):
+    print(f'~~~~~CURRENT ROOM: {player.current_room.id} \n~~~~~TRAVERSAL PATH: {traversal_path}')
+    dft_recursive(starting_room)
+    # # CREATE A STACK AND QUEUE
+    # ss = Stack()
+    # # qq = Queue()
+    # # ADD ROOM TO STACK
+    # ss.push([starting_room])
+    # # qq.enqueue([starting_room])
+    # # BASE CASE
+    # if starting_room is None:
+    #     return
+    # # INITIALIZE VISITED
+    # if visited is None:
+    #     visited = set()
+    # if starting_room not in visited:
+    #     # WHILE THE STACK HAS AT LEAST ONE ELEMENT
+    #     while ss.size() > 0:
+    #         # POP OUT THAT ELEMENT AND PUT IT INTO OUR NEW ARRAY
+    #         pathSS = ss.pop()
+    #         # print('PATH', path)
+    #         # CHECK IF THE LAST ELEMENT HAS BEEN VISITED ALREADY
+    #         if pathSS[-1] not in visited:
+    #             # ADD IT TO VISITED
+    #             visited.add(starting_room)
+    #             # DO THE THING
+    #             print(pathSS[-1])
+    #             # PUSH ALL NEIGHBORS
+    #             for direction in player.current_room.get_exits():
+    #                 next_room = player.current_room.get_room_in_direction(direction).id
+    #                 new_path = list(pathSS)
+    #                 new_path.append(next_room)
+    #                 ss.push(new_path)
+    #                 # qq.enqueue(new_path)
+    #                 # RECURSE WITH LAST ELEMENT AND OUR VISITED SET
+    #                 if next_room == pathSS[-1]:
+    #                     print('PATH', pathSS[-1], direction, 'NEWPATH', new_path)
+    #                     traversal_path.append(direction)
+    #                     player.travel(direction)
+    #                     lets_go(pathSS[-1], visited)
+            # else:
+    
+
+# GO INTO A ROOM GET ALL EXITS KNOW WHETHER I'VE BEEN IN THOSE EXISTS OR NOT
+
+def dft_recursive(starting_room, visited = None):
+        """
+        Print each vertex in depth-first order
+        beginning from starting_vertex.
+
+        This should be done using recursion.
+        """
+        graph = Graph()
+        # INITIATE STACK WITH THE FIRST VERTEX
+        ss = Stack()
+        ss.push([starting_room])
+        # BASE CASE: IF STARTING VERTEX IS NONE THEN STOP RECURSION
+        if starting_room is None:
+            return
+        # INITIALIZE VISITED
+        if visited is None:
+            visited = set()
+        # IF THE STARTING VERTEX HAS NOT ALREADY BEEN VISITED
+        if starting_room not in visited:
+            # WHILE THE STACK HAS AT LEAST ONE ELEMENT
+            while ss.size() > 0:
+                # POP OUT THAT ELEMENT AND PUT IT INTO OUR NEW ARRAY
+                path = ss.pop()
+                # CHECK IF THE LAST ELEMENT HAS BEEN VISITED ALREADY
+                if path[-1] not in visited:
+                    # DO THE THING
+                    print(path[-1])
+                    # ADD IT TO VISITED
+                    # visited.add(starting_room)
+                    visited.add(path[-1])
+                    # PUSH ALL NEIGHBORS
+                    exits = dict()
+                    for direction in player.current_room.get_exits():
+                        exits[direction] = '?'
+                        graph.vertices[room] = exits
+                        next_room = player.current_room.get_room_in_direction(direction).id
+                        new_path = list(path)
+                        new_path.append(next_room)
+                        ss.push(new_path)
+                        # RECURSE WITH LAST ELEMENT AND OUR VISITED SET
+                        if next_room == path[-1]:
+                            print('PATH', path[-1], direction, 'NEWPATH', new_path)
+                            traversal_path.append(direction)
+                            player.travel(direction)
+                            dft_recursive(path[-1], visited)
+        print('VISITED', visited, 'TRAVERSAL PATH', traversal_path, 'STACK', ss.stack)
+
+# print(f'CURRENT GRAPH: {graph.vertices}')
+    # # ADDING ROOM TO GRAPH/VISITED
+    # if starting_room in graph.vertices:
+    #     return
+    # if starting_room not in graph.vertices:
+    #     graph.add_vertex(room)
+    #     exits = dict()
+    #     for direction in player.current_room.get_exits():
+    #         exits[direction] = '?'
+    #         graph.vertices[room] = exits
+    #     for k, v in graph.vertices[room].items():
+    #         if v == '?':
+    #             player.travel(k)
+    #             print('TRAVEL TO ROOM:', k, player.current_room.id)
+    #             graph.vertices[room][k] = player.current_room.id
+    #             lets_go(player.current_room.id, graph)
+    #             print(f'CURRENT GRAPH: {graph.vertices}', room, player.current_room.id)
+    # return None
+    # print(f'CURRENT GRAPH: {graph.vertices}', room, player.current_room.id)
+    # print('TRAVERSAL PATH', traversal_path)
+    # visited = graph.vertices
+
+
+    # WHILE STACK LENGTH IS LESS THAN 0:
+    # while stack.size() > 0:
+    #     # TEMP VAR = POP OUT LAST ELEMENT IN STACK
+    #     path = stack.pop()
+    #     last_room = path[-1]
+    #     # IF LAST ROOM IN VAR IS NOT IN VISITED:
+    #     print(last_room not in visited, last_room)
+    #     if last_room not in visited:
+    #         # ADD LAST ROOM TO VISITED
+    #         graph.add_vertex(last_room)
+    #         exits = dict()
+    #         # GET_EXISTS() OF ROOM (GIVES BACK ARRAY)
+    #         # LOOP THROUGH ARRAY AND ADD TO VALUE WITH GET_ROOM_IN_DIRECTION(LOOPED ELEMENT) AS INNER VALUE
+    #         for direction in player.current_room.get_exits():
+    #             next_room = player.current_room.get_room_in_direction(direction).id
+    #             exits[direction] = '?'
+    #             visited[player.current_room.id] = exits
+    #             new_path = list(path)
+    #             new_path.append(next_room)
+    #             stack.push(new_path)
+
+lets_go(player.current_room.id)
+
+# TRAVERSAL TEST
+visited_rooms = set()
+player.current_room = world.starting_room
+visited_rooms.add(player.current_room)
+
+for move in traversal_path:
+    player.travel(move)
+    visited_rooms.add(player.current_room)
+
+if len(visited_rooms) == len(room_graph):
+    print(f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
+else:
+    print("TESTS FAILED: INCOMPLETE TRAVERSAL")
+    print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
+
+
+
+#######
+# UNCOMMENT TO WALK AROUND
+#######
+# player.current_room.print_room_description(player)
+# while True:
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     elif cmds[0] == "q":
+#         break
+#     else:
+#         print("I did not understand that command.")
