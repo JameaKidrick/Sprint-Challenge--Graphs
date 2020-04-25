@@ -16,8 +16,18 @@
 #      010--011--006                     #
 #                                        #
 
-{0: {'n': 1, 's': 5, 'w': '?', 'e': '?'}, 1: {'n': 2, 's': 0}, 2: {'s': 1}, 5: {'n': 0, 's': 6}, 6: {'n': 5, 'w': 11}, 11: {'w': 10, 'e': 6}, 10: {'n': 9, 'e': 11}, 9: {'n': 8, 's': 10}, 8: {'s': 9, 'e': 7}, 7: {'w': 
-8, 'e': '?'}}
+{
+0: {'n': 1, 's': 5, 'w': '?', 'e': '?'}, 
+1: {'n': 2, 's': 0}, 
+2: {'s': 1}, 
+5: {'n': 0, 's': 6}, 
+6: {'n': 5, 'w': 11}, 
+11: {'w': 10, 'e': 6}, 
+10: {'n': 9, 'e': 11}, 
+9: {'n': 8, 's': 10}, 
+8: {'s': 9, 'e': 7}, 
+7: {'w': 8, 'e': '?'}
+}
 
 # INIT
   # GET CURRENT ROOM
@@ -70,3 +80,4 @@
 # BFS WILL TRAVERSE OVER OUR VISITED GRAPH
   # DESTINATION IS A ROOM WITH QUESTION MARKS
   # BUILDING A PATH TO TRAVERSE AFTER FINDING THE DESTINATION
+
