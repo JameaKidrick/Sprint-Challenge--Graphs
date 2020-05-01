@@ -16,9 +16,9 @@ world = World()
 # map_file = "maps/test_line.txt"
 # ['n', 'n']
 # map_file = "maps/test_cross.txt"
-# map_file = "maps/test_loop.txt"
+map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-map_file = "maps/main_maze.txt"
+# map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -48,10 +48,11 @@ def lets_go(starting_room):
     visited = graph.vertices
     # WHILE STACK LENGTH IS LESS THAN 0:
     while ss.size() > 0:
-        # print('VISITED', visited)
+        print('VISITED', visited)
         # print(f'~~~~~CURRENT ROOM: {player.current_room.id} \n~~~~~POSSIBLE EXITS: {player.current_room.get_exits()} \n~~~~~TRAVERSAL PATH: {traversal_path} \n~~~~~VISITED: {visited} \n~~~~~STACK: {ss.stack}\n\n')
         # TEMP VAR = POP OUT LAST ELEMENT IN STACK
         room_info = ss.pop()
+        print('ROOM INFO', room_info)
         if room_info[-1] is not None:
             # print('ROOM INFO SEPARATION ~~~~~~~~', room_info[-1][0])
             direction = room_info[-1][0]
@@ -61,9 +62,10 @@ def lets_go(starting_room):
             last_room = room_info[1]
         # print('ROOM INFO', room_info, direction, last_room)
         # IF LAST ROOM IN VAR IS NOT IN VISITED:
-        print('PLAYER CURRENT ROOM', player.current_room.id)
+        print('CURRENT ROOM BEFORE CHECKING IF IN VISITED', player.current_room.id)
         if player.current_room.id not in visited:
             add_to_visited(graph, player.current_room.id, visited)
+            print('CHECK', player.current_room.id, last_room, direction)
             if last_room != None and direction != None:
                 visited[last_room][direction] = player.current_room.id
                 visited[player.current_room.id][directions[direction]] = last_room
@@ -77,24 +79,46 @@ def lets_go(starting_room):
             else:
                 unknown_room = bfs(player.current_room.id, visited,'?')
                 if unknown_room is not None:
-                    new_path = list(room_info)
-                    print('', '', unknown_room)
-                    new_path.append((unknown_room[0], unknown_room[1]))
-                    traversal_path.append(unknown_room[0])
-                    ss.push(new_path)
-                    player.travel(unknown_room[0])
+                    # new_path = list(room_info)
+                    # new_path.append((unknown_room[0], unknown_room[1]))
+                    print('CURRENT ROOM', player.current_room.id, 'PATH FROM BFS', unknown_room)
+                    last_room_bfs = player.current_room.id
+                    for move in unknown_room:
+                        print('NEXT MOVE', move)
+                        traversal_path.append(move)
+                        player.travel(move)
+                        print(f'MOVING {move} FROM {last_room_bfs} TO {player.current_room.id}')
+                        if player.current_room.id not in visited:
+                            new_path = list(room_info)
+                            new_path.append((move, last_room_bfs))
+                            ss.push(new_path)
+                        else:
+                            last_room_bfs = player.current_room.id
                 else:
-                    # print('FOUND FULL MAP')
+                    print('FOUND FULL MAP')
                     print(visited)
                     return
         else:
+            visited[last_room][direction] = player.current_room.id
+            visited[player.current_room.id][directions[direction]] = last_room
             unknown_room = bfs(player.current_room.id, visited,'?')
             if unknown_room is not None:
-                new_path = list(room_info)
-                new_path.append((unknown_room[0], unknown_room[1]))
-                traversal_path.append(unknown_room[0])
-                ss.push(new_path)
-                player.travel(unknown_room[0])
+                print('CURRENT ROOM', player.current_room.id, 'PATH FROM BFS', unknown_room)
+                last_room_bfs = player.current_room.id
+                for move in unknown_room:
+                    print('NEXT MOVE', move)
+                    traversal_path.append(move)
+                    player.travel(move)
+                    print(f'MOVING {move} FROM {last_room_bfs} TO {player.current_room.id}')
+                    print('VISITED IN BFS 2', visited)
+                    if player.current_room.id not in visited:
+                        new_path = list(room_info)
+                        new_path.append((move, last_room_bfs))
+                        ss.push(new_path)
+                        print('CURRENT ROOM', player.current_room.id, last_room_bfs)
+                    else:
+                        last_room_bfs = player.current_room.id
+
 
 def add_to_visited(graph, room, visited):
     # ADD LAST ROOM TO VISITED
@@ -115,32 +139,20 @@ def bfs(current_room, visited, destination):
     while qq.size() > 0:
         path = qq.dequeue()
         if destination in visited[path[-1]].values():
-            direction = [key for key, value in visited[path[-1]].items() if value == '?']
-            for location in direction:
-                if player.current_room.get_room_in_direction(location) is not None:
-                    # print('location', player.current_room.get_room_in_direction(location).id, player.current_room.get_room_in_direction(location).id in visited, visited)
-                    if player.current_room.get_room_in_direction(location).id in visited:
-                        # print('location', location)
-                        visited[player.current_room.get_room_in_direction(location).id][directions[location]] = player.current_room.id
-                
-            direction = [key for key, value in visited[path[-1]].items() if value == '?']
-            # print('GETTING ALL DIRECTIONS', player.current_room.id, [key for key, value in visited[path[-1]].items() if value == '?'])
-            print(visited, player.current_room.id, direction, path[-1], 'QQ', qq.queue)
-            return [direction[0], player.current_room.id]
-        # else:
-        #     print('NOT WORKING', path[-1], visited[path[-1]].values(), visited[path[-1]].values())
+            direction = [key for key, value in visited[path[-1]].items() if value == '?'][0]
+            travel.append(direction)
+            return travel
         if path[-1] not in visited_qq:
-            print('PATH', path[-1])
             visited_qq.add(path[-1])
             for next_direction, next_room in visited[path[-1]].items():
-                # if next_room not in visited_qq:
-                new_path = list(path)
-                new_path.append(next_room)
-                qq.enqueue(new_path)
-                travel.append(next_direction)
-                # player.travel(next_direction)
+                if next_room not in visited_qq:
+                    new_path = list(path)
+                    new_path.append(next_room)
+                    qq.enqueue(new_path)
+                    travel.append(next_direction)
 
 lets_go(player.current_room.id)
+
 
     # print(f'CURRENT GRAPH: {graph.vertices}')
     # # ADDING ROOM TO GRAPH/VISITED
